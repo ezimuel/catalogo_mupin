@@ -1,0 +1,160 @@
+-- DROP DATABASE IF EXISTS mupin;
+
+-- CREATE DATABASE cgsctugb_collection;
+
+USE cgsctugb_collection;
+
+CREATE TABLE IF NOT EXISTS genericobject(
+    ObjectID VARCHAR(20) NOT NULL,
+    Note TEXT,
+    Url VARCHAR(100),
+    Tag VARCHAR(300),
+    PRIMARY KEY (ObjectID)
+);
+
+-- COMPUTER
+
+CREATE TABLE IF NOT EXISTS cpu(
+    CpuID INTEGER NOT NULL AUTO_INCREMENT,
+    ModelName VARCHAR(100) NOT NULL,
+    Speed VARCHAR(20) NOT NULL,
+    PRIMARY KEY (CpuID)
+);
+
+CREATE TABLE IF NOT EXISTS ram(
+    RamID INTEGER NOT NULL AUTO_INCREMENT,
+    ModelName VARCHAR(100) NOT NULL,
+    Size VARCHAR(20) NOT NULL,
+    PRIMARY KEY (RamID)
+);
+
+CREATE TABLE IF NOT EXISTS os(
+    OsID INTEGER NOT NULL AUTO_INCREMENT,
+    Name VARCHAR(100) NOT NULL UNIQUE,
+    PRIMARY KEY (OsID)
+);
+
+CREATE TABLE IF NOT EXISTS computer(
+    ObjectID VARCHAR(20) NOT NULL,
+    ModelName VARCHAR(100) NOT NULL,
+    Year INTEGER NOT NULL,
+    CpuID INTEGER NOT NULL,
+    RamID INTEGER NOT NULL,
+    HddSize VARCHAR(20) NULL,
+    OsID INTEGER NULL,
+    PRIMARY KEY (ObjectID),
+    FOREIGN KEY (ObjectID) REFERENCES genericobject(ObjectID),
+    FOREIGN KEY (CpuID) REFERENCES cpu(CpuID),
+    FOREIGN KEY (RamID) REFERENCES ram(RamID),
+    FOREIGN KEY (OsID) REFERENCES os(OsID)    
+);
+
+-- /COMPUTER
+
+-- PERIPHERAL
+
+CREATE TABLE IF NOT EXISTS peripheraltype(
+    PeripheralTypeID INTEGER NOT NULL AUTO_INCREMENT,
+    Name VARCHAR(100) NOT NULL UNIQUE,
+    PRIMARY KEY (PeripheralTypeID)
+);
+
+CREATE TABLE IF NOT EXISTS peripheral(
+    ObjectID VARCHAR(20) NOT NULL,
+    ModelName VARCHAR(100) NOT NULL,    
+    PeripheralTypeID INTEGER NOT NULL,
+    PRIMARY KEY (ObjectID),
+    FOREIGN KEY (ObjectID) REFERENCES genericobject(ObjectID),
+    FOREIGN KEY (PeripheralTypeID) REFERENCES peripheraltype(PeripheralTypeID)
+);
+
+-- /PERIPHERAL
+
+-- BOOK & MAGAZINE
+
+CREATE TABLE IF NOT EXISTS publisher(
+    PublisherID INTEGER NOT NULL AUTO_INCREMENT,
+    Name VARCHAR(100) NOT NULL UNIQUE,
+    PRIMARY KEY (PublisherID)
+);
+
+CREATE TABLE IF NOT EXISTS book(
+    ObjectID VARCHAR(20) NOT NULL,
+    Title VARCHAR(100) NOT NULL,
+    PublisherID INTEGER NOT NULL,
+    Year INTEGER NOT NULL,
+    Pages INTEGER NULL,
+    ISBN VARCHAR(13) NULL, 
+    PRIMARY KEY (ObjectID),
+    FOREIGN KEY (ObjectID) REFERENCES genericobject(ObjectID),
+    FOREIGN KEY (PublisherID) REFERENCES publisher(PublisherID)
+);
+
+CREATE TABLE IF NOT EXISTS author(
+    AuthorID INTEGER NOT NULL AUTO_INCREMENT,
+    firstname VARCHAR(100) NOT NULL,
+    lastname VARCHAR(100) NOT NULL,
+    PRIMARY KEY (AuthorID)
+);
+
+CREATE TABLE IF NOT EXISTS bookauthor(
+    BookID VARCHAR(20) NOT NULL,
+    AuthorID INTEGER NOT NULL,    
+    PRIMARY KEY (BookID, AuthorID),
+    FOREIGN KEY (BookID) REFERENCES book(ObjectID),
+    FOREIGN KEY (AuthorID) REFERENCES author(AuthorID)
+);
+
+CREATE TABLE IF NOT EXISTS magazine(
+    ObjectID VARCHAR(20) NOT NULL,
+    Title VARCHAR(100) NOT NULL,
+    MagazineNumber INTEGER NOT NULL,
+    Year INTEGER NOT NULL,  
+    PublisherID INTEGER NOT NULL,
+    PRIMARY KEY (ObjectID),
+    FOREIGN KEY (ObjectID) REFERENCES genericobject(ObjectID),
+    FOREIGN KEY (PublisherID) REFERENCES publisher(PublisherID)
+);
+
+-- / BOOK & MAGAZINE
+
+-- SOFTWARE
+
+CREATE TABLE IF NOT EXISTS softwaretype(
+    SoftwareTypeID INTEGER NOT NULL AUTO_INCREMENT,
+    Name VARCHAR(100) NOT NULL UNIQUE,
+    PRIMARY KEY (SoftwareTypeID)
+);
+
+CREATE TABLE IF NOT EXISTS supporttype(
+    SupportTypeID INTEGER NOT NULL AUTO_INCREMENT,
+    Name VARCHAR(100) NOT NULL UNIQUE,
+    PRIMARY KEY (SupportTypeID)
+);
+
+CREATE TABLE IF NOT EXISTS software(
+    ObjectID VARCHAR(20) NOT NULL,
+    Title VARCHAR(100) NOT NULL,
+    OsID INTEGER NOT NULL,
+    SoftwareTypeID INTEGER NOT NULL,
+    SupportTypeID INTEGER NOT NULL,
+    PRIMARY KEY (ObjectID),
+    FOREIGN KEY (ObjectID) REFERENCES genericobject(ObjectID),
+    FOREIGN KEY (OsID) REFERENCES os(OsID),
+    FOREIGN KEY (SoftwareTypeID) REFERENCES softwaretype(SoftwareTypeID),
+    FOREIGN KEY (SupportTypeID) REFERENCES supporttype(SupportTypeID)
+);
+
+
+-- /SOFTWARE
+
+-- User
+
+CREATE TABLE IF NOT EXISTS user(
+    Email VARCHAR(100) NOT NULL,
+    Password VARCHAR(100) NOT NULL,
+    firstname VARCHAR(100) NOT NULL,
+    lastname VARCHAR(100) NOT NULL,
+    Privilege SMALLINT NOT NULL, -- employee = 0, admin = 1
+    PRIMARY KEY (Email)
+);
